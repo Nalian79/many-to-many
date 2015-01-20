@@ -117,6 +117,10 @@ class Pet(Base):
     breed_id = Column(Integer, ForeignKey('breed.id'), nullable=False )
     shelter_id = Column(Integer, ForeignKey('shelter.id') )
 
+    # foreign key to self to set up parent/child relationship..
+    parent_id = Column(Integer, ForeignKey(id), nullable=True)
+    parent = relationship('Pet', remote_side=id, backref="children")
+
     # no foreign key here, it's in the many-to-many table
     # mapped relationship, pet_person_table must already be in scope!
     people = relationship('Person', secondary=pet_person_table,
@@ -203,7 +207,7 @@ class PetPersonAssociation(Base):
     # which concatenates first and last name.
 
     def __repr__(self):
-        return "PetPersonAssociation( {} : {} )".format(self.pet.name, 
+        return "PetPersonAssociation( {} : {} )".format(self.pet.name,
             self.person.full_name)
 
 
@@ -394,7 +398,18 @@ if __name__ == "__main__":
     log.info("{} has the nicknames: {}".format(sonya.name, sonya.nickname))
     log.info("{} has the nicknames: {}".format(duke.name, duke.nickname))
 
+    # Creating children for pets we already have.
+    baby_spot = Pet(name="Spot Jr.", parent=spot, adopted = False,
+                    breed=spot.breed)
+
+    db_session.add(baby_spot)
+    db_session.commit()
+
+#    import pdb
+#    pdb.set_trace()
+
     #################################################
 
     db_session.close()
     log.info("all done!")
+
