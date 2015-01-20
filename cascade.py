@@ -39,7 +39,7 @@ class Species(Base):
     # database fields
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    breeds = relationship('Breed', backref="species")
+    breeds = relationship('Breed', backref="species", cascade="all, delete-orphan")
 
     # methods
     def __repr__(self):
@@ -57,7 +57,8 @@ class Breed(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     species_id = Column(Integer, ForeignKey('species.id'), nullable=False )
-    pets = relationship('Pet', backref="breed")
+    pets = relationship('Pet', backref="breed", cascade="all, delete-orphan")
+
     # methods
     def __repr__(self):
         return "{}: {}".format(self.name, self.species)
@@ -125,6 +126,8 @@ class Pet(Base):
     # mapped relationship, pet_person_table must already be in scope!
     people = relationship('Person', secondary=pet_person_table,
                           backref='pets')
+
+    # mapped relationship 'petnicknames' from backref on PetNicknames class
 
     def __repr__(self):
         return "Pet:{}".format(self.name)
@@ -218,13 +221,15 @@ class PetNicknames(Base):
     __tablename__ = 'nicknames'
 
     id = Column(Integer, primary_key=True)
-    pet_id = Column(Integer, ForeignKey('pet.id'), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'), nullable=False)
+    pet_id = Column(Integer, ForeignKey('pet.id'), nullable=True)
+    person_id = Column(Integer, ForeignKey('person.id'), nullable=True)
 
     nickname = Column(Text)
 
-    person = relationship('Person', backref=backref('pet_nickname'))
-    pet = relationship('Pet', backref=backref('nickname'))
+    person = relationship('Person', backref='pet_nickname')
+    pet = relationship('Pet', backref='nickname',
+                       cascade='all, delete-orphan',
+                       single_parent=True)
 
 #    @property
     def __repr__(self):
@@ -405,8 +410,8 @@ if __name__ == "__main__":
     db_session.add(baby_spot)
     db_session.commit()
 
-#    import pdb
-#    pdb.set_trace()
+    import pdb
+    pdb.set_trace()
 
     #################################################
 
