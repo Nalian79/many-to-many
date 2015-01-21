@@ -380,19 +380,22 @@ if __name__ == "__main__":
 
     # Creating nicknames for the pets
     goofus = PetNicknames(nickname="Goofus",
-                          pet_id=sonya.id,
-                          person_id=karim.id)
+                          pet=sonya,
+                          person=karim)
     crazypants = PetNicknames(nickname="Crazypants",
-                              pet_id=sonya.id,
-                              person_id=karim.id)
+                              pet=sonya,
+                              person=karim)
     dukers = PetNicknames(nickname="Dukers",
-                          pet_id=duke.id,
-                          person_id=gary.id)
+                          pet=duke,
+                          person=gary)
 
     db_session.add_all([goofus, crazypants, dukers])
     db_session.commit()
     log.info("{} has the nicknames: {}".format(sonya.name, sonya.nickname))
     log.info("{} has the nicknames: {}".format(duke.name, duke.nickname))
+
+    import pdb
+    pdb.set_trace()
 
     #################################################
 
